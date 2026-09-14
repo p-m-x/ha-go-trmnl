@@ -1,0 +1,31 @@
+name: "TRMNL Display"
+description: "Serves Home Assistant entity states to TRMNL e-ink display devices via a go-trmnl-compatible API."
+version: "1.0.0"
+slug: "ha_go_trmnl"
+init: false
+arch:
+  - aarch64
+  - amd64
+startup: services
+homeassistant_api: true
+
+ports:
+  8080/tcp: 8080
+ports_description:
+  8080/tcp: "TRMNL device API and image server"
+
+webui: "http://[HOST]:[PORT:8080]/preview"
+
+options:
+  entities:
+    - sensor.sun_next_rising
+  refresh_rate: 60
+  title: "Home Assistant"
+  columns: 2
+
+schema:
+  entities:
+    - str
+  refresh_rate: int
+  title: str
+  columns: int
