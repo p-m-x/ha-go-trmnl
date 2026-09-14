@@ -6,6 +6,9 @@ description: >
 version: "0.3.0"
 slug: "go_trmnl"
 init: false
+# Pre-built images on ghcr.io — HA pulls these instead of building locally.
+# {arch} is replaced by the supervisor with the actual architecture.
+image: "ghcr.io/p-m-x/{arch}-addon-go_trmnl"
 arch:
   - aarch64
   - amd64
