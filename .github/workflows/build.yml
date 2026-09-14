@@ -18,6 +18,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+      # Required to call the GitHub Packages REST API for visibility changes
+      id-token: write
 
     strategy:
       matrix:
@@ -78,3 +80,16 @@ jobs:
             TARGETARCH=${{ matrix.targetarch }}
           cache-from: type=gha,scope=${{ matrix.arch }}
           cache-to: type=gha,mode=max,scope=${{ matrix.arch }}
+
+      - name: Make package public
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PACKAGE="${{ matrix.arch }}-addon-${{ env.SLUG }}"
+          gh api --method PATCH \
+            /user/packages/container/${PACKAGE} \
+            -f visibility=public \
+            --silent \
+            && echo "Package ${PACKAGE} set to public" \
+            || echo "Could not set visibility (may already be public or need a PAT)"
