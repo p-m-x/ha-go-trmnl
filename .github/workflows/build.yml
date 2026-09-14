@@ -27,12 +27,11 @@ jobs:
           - arch: amd64
             platform: linux/amd64
             targetarch: amd64
+            build_from: ghcr.io/home-assistant/amd64-base:latest
           - arch: aarch64
             platform: linux/arm64
             targetarch: arm64
-          - arch: armhf
-            platform: linux/arm/v7
-            targetarch: arm
+            build_from: ghcr.io/home-assistant/aarch64-base:latest
 
     steps:
       - name: Checkout
@@ -76,7 +75,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            BUILD_FROM=ghcr.io/home-assistant/base:latest
+            BUILD_FROM=${{ matrix.build_from }}
             TARGETARCH=${{ matrix.targetarch }}
           cache-from: type=gha,scope=${{ matrix.arch }}
           cache-to: type=gha,mode=max,scope=${{ matrix.arch }}

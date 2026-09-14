@@ -9,7 +9,6 @@ RUN set -eu; \
     case "${TARGETARCH}" in \
       "amd64")  ARCH="linux-amd64" ;; \
       "arm64")  ARCH="linux-arm64" ;; \
-      "arm")    ARCH="linux-armv7" ;; \
       *)        echo "Unsupported architecture: ${TARGETARCH}" && exit 1 ;; \
     esac; \
     URL="https://github.com/gesellix/go-trmnl/releases/download/${TRMNL_VERSION}/trmnld-${TRMNL_VERSION}-${ARCH}"; \
