@@ -1,16 +1,23 @@
 ARG BUILD_FROM=ghcr.io/home-assistant/base:latest
+FROM ${BUILD_FROM}
 
-# ── Stage 1: build the Go binary ─────────────────────────────────────────────
-FROM golang:1.26-alpine AS builder
-WORKDIR /src
-COPY go.mod go.sum ./
-RUN go mod download
-COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /ha-trmnld ./cmd/ha-trmnld
+ARG TRMNL_VERSION="v0.3.0"
+ARG TARGETARCH
 
-# ── Stage 2: minimal HA base image ───────────────────────────────────────────
-FROM $BUILD_FROM
-COPY --from=builder /ha-trmnld /ha-trmnld
+# Download the correct trmnld binary for the target architecture
+RUN set -eu; \
+    case "${TARGETARCH}" in \
+      "amd64")  ARCH="linux-amd64" ;; \
+      "arm64")  ARCH="linux-arm64" ;; \
+      "arm")    ARCH="linux-armv7" ;; \
+      *)        echo "Unsupported architecture: ${TARGETARCH}" && exit 1 ;; \
+    esac; \
+    URL="https://github.com/gesellix/go-trmnl/releases/download/${TRMNL_VERSION}/trmnld-${TRMNL_VERSION}-${ARCH}"; \
+    echo "Downloading ${URL}"; \
+    wget -q -O /usr/local/bin/trmnld "${URL}"; \
+    chmod +x /usr/local/bin/trmnld
+
 COPY run.sh /run.sh
-RUN chmod a+x /run.sh
+RUN chmod +x /run.sh
+
 CMD ["/run.sh"]
